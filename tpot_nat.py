@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
- This script is used to configure port-forwarding for T-POT through Check Point:
+This script is used to configure port-forwarding for T-POT through Check Point:
  - Add TCP Services
  - Add UDP Services
  - Add port-forwarding NAT rule
@@ -24,7 +24,8 @@ def main():
     parser.add_argument("-p", "--password", default="Cpwins!1")
     parser.add_argument("-m", "--management", default="10.0.1.100")
     parser.add_argument("-d", "--domain", default="")
-    parser.add_argument("-op", "--operation", default="add")
+    parser.add_argument("-op", "--operation", default="delete")
+    parser.add_argument("-hn", "--host", default="t-pot")
 
     parsed_args = parser.parse_args()
 
@@ -205,7 +206,7 @@ def main():
                     "original-destination": "hq_gw",
                     "original-service": "tpot_services",
                     "translated-source": "Original",
-                    "translated-destination": "host_10.0.4.70_hq_tpot",
+                    "translated-destination": f"{parsed_args.host}",
                     "translated-service": "Original",
                 },
             )
@@ -222,7 +223,7 @@ def main():
             else:
                 log.error(publish.error_message)
 
-        else:
+        elif parsed_args.operation == "delete":
             # Delete NAT section
             delete_nat_section_response = client.api_call(
                 "delete-nat-section",
@@ -314,6 +315,8 @@ def main():
                 log.info("Publishing deleting services session")
             else:
                 log.error(publish.error_message)
+        else:
+            print("Please select the operation")
 
 
 if __name__ == "__main__":
